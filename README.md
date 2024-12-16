@@ -1,4 +1,6 @@
+# Next.js School Management Application
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This project based on this [tutorial](https://www.youtube.com/watch?v=myYlGLFxZas&t=270s) and this [github](https://github.com/safak/next-dashboard-ui/blob/starter/package.json).
 
 ## Getting Started
 
