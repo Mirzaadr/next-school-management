@@ -4,9 +4,11 @@ const nextConfig: NextConfig = {
   /* config options here */
   output: "standalone",
   env: {
-    PORT: process.env.PORT || 3000,
+    PORT: process.env.PORT,
   },
-
+  images: {
+    remotePatterns: [{ hostname: "images.pexels.com" }],
+  },
 };
 
 export default nextConfig;
