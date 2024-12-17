@@ -20,7 +20,7 @@ export default function DashboardLayout({
         <Menu />
       </div>
       {/* RIGHT */}
-      <div className="w-full bg-[#F7F8FA] overflow-scroll">
+      <div className="w-full bg-[#F7F8FA] overflow-scroll flex flex-col">
         <Navbar />
         {children}
       </div>
