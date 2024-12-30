@@ -1,5 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
+import { role } from "@/lib/data";
+import { SheetClose } from "@/components/ui/sheet";
+import React from "react";
 
 export const menuItems = [
   {
@@ -116,26 +119,36 @@ export const menuItems = [
   },
 ];
 
-import { role } from "@/lib/data";
+interface MenuProps {
+  inSheet?: boolean
+}
 
-const Menu = () => {
+const Menu = ({ inSheet }: MenuProps) => {
+  const [SheetCloseWrapper, sheetCloseWrapperProps] = inSheet
+    ? [SheetClose, { asChild: true }]
+    : [React.Fragment, {}];
   return (
-    <div className="mt-4 text-sm">
+    <div className="mt-2 text-sm">
       {menuItems.map((menu) => (
         <div className="flex flex-col gap-2" key={menu.title}>
-          <span className="hidden lg:block text-gray-400 font-light my-4">{menu.title}</span>
+          <span className={`${inSheet ? "block" : "hidden lg:block"} text-gray-400 font-light my-2`}>{menu.title}</span>
           {menu.items.map((item) => {
             if (item.visible.includes(role)) {
               return (
-                <Link href={item.href} key={item.label} className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-lamaSkyLight">
-                  <Image
-                    src={item.icon}
-                    alt={`${menu.title}-${item.label}`}
-                    width={20}
-                    height={20}
-                  />
-                  <span className="hidden lg:block">{item.label}</span>
-                </Link>
+                <SheetCloseWrapper {...sheetCloseWrapperProps} key={item.label}>
+                  <Link href={item.href} key={item.label} className={
+                    `flex items-center  gap-4 text-gray-500 py-2 rounded-md hover:bg-lamaSkyLight
+                    ${inSheet ? "justify-start px-2" : "justify-center lg:justify-start md:px-2"}`
+                    }>
+                    <Image
+                      src={item.icon}
+                      alt={`${menu.title}-${item.label}`}
+                      width={20}
+                      height={20}
+                    />
+                    <span className={`${inSheet ? "block" : "hidden lg:block"}`}>{item.label}</span>
+                  </Link>
+                </SheetCloseWrapper>
               );
             }
           })}

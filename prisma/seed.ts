@@ -2,16 +2,32 @@ import { Day, PrismaClient, UserSex } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  // User
+  await prisma.user.create({
+    data: {
+      username: "admin1",
+      password: "$2a$10$1.l4xAnNalrU7Yj8fnMTGO0ZcoxuRM0P.w1ROk6YcszE6ykCGuXhW",
+      name: "John Dee",
+      email: "john.dee@mail.com",
+    }
+  });
+  await prisma.user.create({
+    data: {
+      username: "teacher1",
+      password: "$2a$10$1.l4xAnNalrU7Yj8fnMTGO0ZcoxuRM0P.w1ROk6YcszE6ykCGuXhW",
+      name: "Teacher1",
+      email: "teacher1@example.com",
+    }
+  });
+
   // ADMIN
   await prisma.admin.create({
     data: {
-      id: "admin1",
       username: "admin1",
     },
   });
   await prisma.admin.create({
     data: {
-      id: "admin2",
       username: "admin2",
     },
   });

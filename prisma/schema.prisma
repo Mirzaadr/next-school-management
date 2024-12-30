@@ -13,9 +13,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  username      String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+
+  admin   Admin?
+  student Student?
+  teacher Teacher?
+  parent  Parent?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Admin {
   id       String @id @default(uuid())
   username String @unique
+  user     User?  @relation(fields: [username], references: [username])
 }
 
 model Student {
@@ -40,6 +59,7 @@ model Student {
   attendances Attendance[]
   results     Result[]
   birthday    DateTime
+  user        User?        @relation(fields: [username], references: [username])
 }
 
 model Teacher {
@@ -59,6 +79,7 @@ model Teacher {
   lessons   Lesson[]
   classes   Class[]
   birthday  DateTime
+  user      User?     @relation(fields: [username], references: [username])
 }
 
 model Parent {
@@ -72,6 +93,7 @@ model Parent {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   students  Student[]
+  user      User?     @relation(fields: [username], references: [username])
 }
 
 model Grade {

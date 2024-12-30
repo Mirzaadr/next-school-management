@@ -1,8 +1,27 @@
 import Image from "next/image";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
+import { Menu as MenuIcon } from "lucide-react";
+import Menu from "./Menu";
+import { Button } from "./ui/button";
+import UserButton from "./UserButton";
 
 const Navbar = () => {
   return (
     <div className='flex items-center justify-between p-4'>
+      
+      <Sheet>
+        <SheetTitle className="hidden" />
+        <SheetTrigger asChild>
+          <Button variant="outline" size="icon" className="md:hidden">
+            <MenuIcon className="size-5" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left">
+          <nav className="grid gap-2 mt-10">
+            <Menu inSheet/>
+          </nav>
+        </SheetContent>
+      </Sheet>
       {/* SEARCH BAR */}
       <div className='hidden md:flex items-center gap-2 text-xs rounded-full ring-[1.5px] ring-gray-300 px-2'>
         <Image src="/search.png" alt="" width={14} height={14}/>
@@ -17,11 +36,12 @@ const Navbar = () => {
           <Image src="/announcement.png" alt="" width={20} height={20}/>
           <div className='absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-purple-500 text-white rounded-full text-xs'>1</div>
         </div>
-        <div className='flex flex-col'>
+        {/* <div className='hidden md:flex flex-col'>
           <span className="text-xs leading-3 font-medium">John Doe</span>
           <span className="text-[10px] text-gray-500 text-right">Admin</span>
-        </div>
-        <Image src="/avatar.png" alt="" width={36} height={36} className="rounded-full"/>
+        </div> */}
+        {/* <Image src="/avatar.png" alt="" width={36} height={36} className="rounded-full"/> */}
+        <UserButton />
       </div>
     </div>
   )
