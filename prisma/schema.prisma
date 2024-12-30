@@ -21,6 +21,7 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
+  role          UserRole
 
   admin   Admin?
   student Student?
@@ -33,13 +34,12 @@ model User {
 
 model Admin {
   id       String @id @default(uuid())
-  username String @unique
-  user     User?  @relation(fields: [username], references: [username])
+  userId   String? @unique
+  user     User?  @relation(fields: [userId], references: [id])
 }
 
 model Student {
   id          String       @id
-  username    String       @unique
   name        String
   surname     String
   email       String?      @unique
@@ -59,12 +59,12 @@ model Student {
   attendances Attendance[]
   results     Result[]
   birthday    DateTime
-  user        User?        @relation(fields: [username], references: [username])
+  userId      String? @unique
+  user        User?        @relation(fields: [userId], references: [id])
 }
 
 model Teacher {
   id        String    @id
-  username  String    @unique
   name      String
   surname   String
   email     String?   @unique
@@ -79,12 +79,12 @@ model Teacher {
   lessons   Lesson[]
   classes   Class[]
   birthday  DateTime
-  user      User?     @relation(fields: [username], references: [username])
+  userId String? @unique
+  user      User?     @relation(fields: [userId], references: [id])
 }
 
 model Parent {
   id        String    @id
-  username  String    @unique
   name      String
   surname   String
   email     String?   @unique
@@ -93,7 +93,8 @@ model Parent {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   students  Student[]
-  user      User?     @relation(fields: [username], references: [username])
+  userId String? @unique
+  user      User?     @relation(fields: [userId], references: [id])
 }
 
 model Grade {
@@ -223,4 +224,11 @@ enum Day {
   FRIDAY
   SATURDAY
   SUNDAY
+}
+
+enum UserRole {
+  ADMIN
+  STUDENT
+  TEACHER
+  PARENT
 }

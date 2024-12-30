@@ -3,32 +3,47 @@ const prisma = new PrismaClient();
 
 async function main() {
   // User
-  await prisma.user.create({
+  const userAdmin = await prisma.user.create({
     data: {
       username: "admin1",
       password: "$2a$10$1.l4xAnNalrU7Yj8fnMTGO0ZcoxuRM0P.w1ROk6YcszE6ykCGuXhW",
       name: "John Dee",
       email: "john.dee@mail.com",
+      role: "ADMIN",
     }
   });
-  await prisma.user.create({
+  const userStudent = await prisma.user.create({
+    data: {
+      username: "student1",
+      password: "$2a$10$1.l4xAnNalrU7Yj8fnMTGO0ZcoxuRM0P.w1ROk6YcszE6ykCGuXhW",
+      name: "Student 1",
+      email: "student1@example.com",
+      role: "STUDENT"
+    }
+  });
+  const userTeacher = await prisma.user.create({
     data: {
       username: "teacher1",
       password: "$2a$10$1.l4xAnNalrU7Yj8fnMTGO0ZcoxuRM0P.w1ROk6YcszE6ykCGuXhW",
-      name: "Teacher1",
+      name: "Teacher 1",
       email: "teacher1@example.com",
+      role: "TEACHER",
+    }
+  });
+  const userParent = await prisma.user.create({
+    data: {
+      username: "parent1",
+      password: "$2a$10$1.l4xAnNalrU7Yj8fnMTGO0ZcoxuRM0P.w1ROk6YcszE6ykCGuXhW",
+      name: "Parent1",
+      email: "parent1@example.com",
+      role: "PARENT",
     }
   });
 
   // ADMIN
   await prisma.admin.create({
     data: {
-      username: "admin1",
-    },
-  });
-  await prisma.admin.create({
-    data: {
-      username: "admin2",
+      userId: userAdmin.id,
     },
   });
 
@@ -75,7 +90,7 @@ async function main() {
     await prisma.teacher.create({
       data: {
         id: `teacher${i}`, // Unique ID for the teacher
-        username: `teacher${i}`,
+        // userId: userTeacher.id,
         name: `TName${i}`,
         surname: `TSurname${i}`,
         email: `teacher${i}@example.com`,
@@ -114,7 +129,7 @@ async function main() {
     await prisma.parent.create({
       data: {
         id: `parentId${i}`,
-        username: `parentId${i}`,
+        // userId: userParent.id,
         name: `PName ${i}`,
         surname: `PSurname ${i}`,
         email: `parent${i}@example.com`,
@@ -129,7 +144,7 @@ async function main() {
     await prisma.student.create({
       data: {
         id: `student${i}`, 
-        username: `student${i}`, 
+        // userId: userStudent.id,
         name: `SName${i}`,
         surname: `SSurname ${i}`,
         email: `student${i}@example.com`,
