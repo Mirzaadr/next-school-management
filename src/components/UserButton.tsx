@@ -18,7 +18,7 @@ const UserButton = (props: Props) => {
     <>
       <div className='hidden md:flex flex-col'>
         <span className="text-xs leading-3 font-medium">{user?.name}</span>
-        <span className="text-[10px] text-gray-500 text-right">Admin</span>
+        <span className="text-[10px] text-gray-500 text-right capitalize">{(user?.role)?.toLowerCase()}</span>
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger>

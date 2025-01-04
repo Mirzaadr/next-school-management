@@ -80,7 +80,7 @@ export async function login(values: z.infer<typeof LoginSchema>) {
     await signIn("credentials", {
       username,
       password,
-      redirectTo: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+      redirectTo: `/${(existingUser.role).toLowerCase()}`,
     })
   } catch (error) {
     if (error instanceof AuthError) {

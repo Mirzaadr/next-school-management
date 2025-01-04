@@ -26,7 +26,7 @@ export const getUserByEmail = async (email: string) => {
   }
 }
 
-export const getUserById = async (userId: string) => {
+export const getUserById = async (userId: string | undefined) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId }

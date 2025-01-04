@@ -33,4 +33,21 @@ export default {
       }
     })
   ],
+  callbacks: {
+    async session({ token, session }) {
+      if (token.sub && session.user) {
+        session.user.id = token.sub;
+      }
+
+      if (token.role && session.user) {
+        session.user.role = token.role;
+      }
+
+      if (token.user) {
+        session.user.name = token.name;
+        session.user.email = token.email || session.user.email;
+      }
+      return session;
+    },
+  }
 } satisfies NextAuthConfig;
