@@ -3,7 +3,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
 import { Menu as MenuIcon } from "lucide-react";
 import Menu from "./Menu";
 import { Button } from "./ui/button";
-import UserButton from "./UserButton";
+import UserButton from "./buttons/UserButton";
 
 const Navbar = () => {
   return (

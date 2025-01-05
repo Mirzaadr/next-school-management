@@ -10,7 +10,7 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useState, useTransition } from "react";
 import { login } from "@/actions/login";
-import { TriangleAlert } from "lucide-react";
+import { Loader2, TriangleAlert } from "lucide-react";
 
 const LoginForm = () => {
   // const [lastResult, action] = useActionState(createInvoice, undefined);
@@ -88,7 +88,12 @@ const LoginForm = () => {
                 <p>{error}</p>
               </div>
             )}
-            <Button type="submit" className="w-full">Submit</Button>
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? 
+                (<><Loader2 className="size-4 mr-2 animate-spin" /> Please Wait</>) :
+                ("Submit")
+              }
+            </Button>
           </form>
         </Form>
       </CardContent>

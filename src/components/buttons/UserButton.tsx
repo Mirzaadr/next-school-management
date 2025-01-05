@@ -3,7 +3,7 @@ import React from 'react'
 import { DropdownMenu, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuContent } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import LogoutButton from '@/components/LogoutButton';
+import LogoutButton from '@/components/buttons/LogoutButton';
 import { LogOutIcon, UserCircle2 } from 'lucide-react';
 import Image from 'next/image';
 
