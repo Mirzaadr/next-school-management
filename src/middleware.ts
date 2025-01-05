@@ -1,9 +1,14 @@
 import authConfig from "@/lib/auth.config";
 import NextAuth from "next-auth";
-import { NextRequest } from "next/server";
-import { authRoutes, DEFAULT_LOGIN_REDIRECT, publicRoutes } from "./routes";
+import { authRoutes, DEFAULT_LOGIN_REDIRECT, publicRoutes, routeAccessMap } from "@/lib/settings";
+import { createRouteMatcher } from "@/lib/routeMatcher";
 
 const { auth } = NextAuth(authConfig);
+
+const matchers = Object.keys(routeAccessMap).map((route) => ({
+  matcher: createRouteMatcher([route]),
+  allowedRoles: routeAccessMap[route],
+}));
 
 export default auth((req) => {
   const { nextUrl } = req;
@@ -12,17 +17,51 @@ export default auth((req) => {
   const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
-
+  
   if (isApiAuthRoute) {
     return;
   }
 
-  if(isAuthRoute) {
-    if (isLoggedIn) {
+  if (isLoggedIn) {
+    if (isAuthRoute) {
       return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl.origin))
     }
+
+    if (!isPublicRoute) {
+      const role = req.auth?.user.role.toLowerCase();
+      const isAllowed = matchers.reduce((acc, {matcher, allowedRoles}) => {
+        if (acc) return acc;
+        return matcher(req) && allowedRoles.includes(role!);
+      }, false);
+    
+      if (!isAllowed) {
+        return Response.redirect(new URL(`/${role}`, nextUrl));
+      }
+    }
+
     return;
   }
+  
+  // if(isAuthRoute) {
+  //   if (isLoggedIn) {
+  //     return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl.origin))
+  //   }
+  //   return;
+  // }
+  
+  // if (isLoggedIn && !isPublicRoute) {
+  //   const role = req.auth?.user.role.toLowerCase();
+  //   const isAllowed = matchers.reduce((acc, {matcher, allowedRoles}) => {
+  //     if (acc) return acc;
+  //     return matcher(req) && allowedRoles.includes(role!);
+  //   }, false);
+
+  //   // console.log(`${nextUrl.pathname} : ${isAllowed ? "Allowed" : "Not Allowed"}`)
+
+  //   if (!isAllowed) {
+  //     return Response.redirect(new URL(`/${role}`, nextUrl));
+  //   }
+  // }
   
   if (!isLoggedIn && !isPublicRoute) {
     let callbackUrl = nextUrl.pathname;

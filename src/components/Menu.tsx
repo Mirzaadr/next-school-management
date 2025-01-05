@@ -3,6 +3,7 @@ import Link from "next/link";
 import { role } from "@/lib/data";
 import { SheetClose } from "@/components/ui/sheet";
 import React from "react";
+import { auth } from "@/lib/auth";
 
 export const menuItems = [
   {
@@ -123,7 +124,9 @@ interface MenuProps {
   inSheet?: boolean
 }
 
-const Menu = ({ inSheet }: MenuProps) => {
+const Menu = async ({ inSheet }: MenuProps) => {
+  const session = await auth()
+  const role = session?.user.role;
   const [SheetCloseWrapper, sheetCloseWrapperProps] = inSheet
     ? [SheetClose, { asChild: true }]
     : [React.Fragment, {}];
@@ -132,8 +135,8 @@ const Menu = ({ inSheet }: MenuProps) => {
       {menuItems.map((menu) => (
         <div className="flex flex-col gap-2" key={menu.title}>
           <span className={`${inSheet ? "block" : "hidden lg:block"} text-gray-400 font-light my-2`}>{menu.title}</span>
-          {menu.items.map((item) => {
-            if (item.visible.includes(role)) {
+          {!!role && menu.items.map((item) => {
+            if (item.visible.includes(role.toLowerCase())) {
               return (
                 <SheetCloseWrapper {...sheetCloseWrapperProps} key={item.label}>
                   <Link href={item.href} key={item.label} className={
