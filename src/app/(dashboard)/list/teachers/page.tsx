@@ -2,28 +2,16 @@ import FormModal from "@/components/FormModal";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
-import { role } from "@/lib/data";
+import { requireUser } from "@/hooks/requireUser";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
-import { Class, Prisma, Subject, Teacher } from "@prisma/client";
+import { Class, Prisma, Subject, Teacher, UserRole } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 
-// type Teacher = {
-//   id: number;
-//   teacherId: string;
-//   name: string;
-//   email?: string;
-//   photo: string;
-//   phone: string;
-//   subjects: string[];
-//   classes: string[];
-//   address: string;
-// };
-
 type TeacherList = Teacher & { subjects: Subject[] } & { classes: Class[] }
 
-const columns = [
+const getColumns = (role: UserRole) => [
   {
     header: "Info",
     accessor: "info",
@@ -53,10 +41,10 @@ const columns = [
     accessor: "address",
     className: "hidden lg:table-cell",
   },
-  {
+  ...(role === "ADMIN" ? [{
     header: "Actions",
     accessor: "action",
-  },
+  }] : []),
 ];
 
 const TeacherListPage = async ({
@@ -64,6 +52,9 @@ const TeacherListPage = async ({
 }: {
   searchParams: { [key: string]: string | undefined };
 }) => {
+  const user = await requireUser();
+  const role = user.role;
+  const columns = getColumns(role);
   const { page, ...queryParams } = await  searchParams;
   const p = page ? parseInt(page) : 1;
   // URL PARAMS CONDITIONS
@@ -132,7 +123,7 @@ const TeacherListPage = async ({
               <Image src="/view.png" alt="" width={16} height={16} />
             </button>
           </Link>
-          {role === "admin" && (
+          {role === "ADMIN" && (
             // <button className="w-7 h-7 flex items-center justify-center rounded-full bg-lamaPurple">
             //   <Image src="/delete.png" alt="" width={16} height={16} />
             // </button>
@@ -157,7 +148,7 @@ const TeacherListPage = async ({
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {role === "admin" && (
+            {role === "ADMIN" && (
               // <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               //   <Image src="/plus.png" alt="" width={14} height={14} />
               // </button>

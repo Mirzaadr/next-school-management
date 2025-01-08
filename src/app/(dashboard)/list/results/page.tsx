@@ -2,13 +2,10 @@ import FormModal from "@/components/FormModal";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
-import {
-  resultsData,
-  role,
-} from "@/lib/data";
+import { requireUser } from "@/hooks/requireUser";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
-import { Prisma } from "@prisma/client";
+import { Prisma, UserRole } from "@prisma/client";
 import Image from "next/image";
 
 type ResultList = {
@@ -23,7 +20,7 @@ type ResultList = {
   startTime: Date;
 };
 
-const columns = [
+const getColumns = (role: UserRole) => [
   {
     header: "Title",
     accessor: "title",
@@ -52,10 +49,10 @@ const columns = [
     accessor: "date",
     className: "hidden md:table-cell",
   },
-  {
+  ...(role === "ADMIN" || role === "TEACHER" ?[{
     header: "Actions",
     accessor: "action",
-  },
+  }] : []),
 ];
 
 const ResultListPage = async ({
@@ -63,7 +60,9 @@ const ResultListPage = async ({
 }: {
   searchParams: { [key: string]: string | undefined };
 }) => {
-
+  const user = await requireUser();
+  const role = user.role;
+  const columns = getColumns(role);
   const { page, ...queryParams } = await searchParams;
   const p = page ? parseInt(page) : 1;
   // URL PARAMS CONDITIONS
@@ -87,6 +86,28 @@ const ResultListPage = async ({
         }
       }
     }
+  }
+  // ROLE CONDITIONS
+  switch (role) {
+    case "ADMIN":
+      break;
+    case "TEACHER":
+      query.OR = [
+        {exam: { lesson: { teacherId: user.profileId }}},
+        {assignment: { lesson: { teacherId: user.profileId }}},
+      ]
+      break;
+    case "STUDENT":
+      query.studentId = user.profileId;
+      break;
+    case "PARENT":
+      query.student = {
+        parentId: user.profileId,
+      };
+      break;
+  
+    default:
+      break;
   }
   const [dataRes, count] = await prisma.$transaction([
     prisma.result.findMany({
@@ -154,7 +175,7 @@ const ResultListPage = async ({
       <td className="hidden md:table-cell">{new Intl.DateTimeFormat("en-US").format(item.startTime)}</td>
       <td>
         <div className="flex items-center gap-2">
-          {role === "admin" || role === "teacher" && (
+          {role === "ADMIN" || role === "TEACHER" && (
             <>
               <FormModal table="result" type="update" data={item} />
               <FormModal table="result" type="delete" id={item.id} />
@@ -179,7 +200,7 @@ const ResultListPage = async ({
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {role === "admin" || role === "teacher" && <FormModal table="result" type="create" />}
+            {role === "ADMIN" || role === "TEACHER" && <FormModal table="result" type="create" />}
           </div>
         </div>
       </div>

@@ -2,16 +2,15 @@ import FormModal from "@/components/FormModal";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
-import { role, subjectsData } from "@/lib/data";
+import { requireUser } from "@/hooks/requireUser";
+import prisma from "@/lib/prisma";
+import { ITEM_PER_PAGE } from "@/lib/settings";
+import { Prisma, Subject, Teacher, UserRole } from "@prisma/client";
 import Image from "next/image";
 
-type Subject = {
-  id: number;
-  name: string;
-  teachers: string[];
-};
+type SubjectList = Subject & { teachers: Teacher[] }
 
-const columns = [
+const getColumns = (role: UserRole) => [
   {
     header: "Subject Name",
     accessor: "name",
@@ -21,23 +20,60 @@ const columns = [
     accessor: "teachers",
     className: "hidden md:table-cell",
   },
-  {
+  ...(role === "ADMIN" ? [{
     header: "Actions",
     accessor: "action",
-  },
+  }] : []),
 ];
 
-const SubjectListPage = () => {
-  const renderRow = (item: Subject) => (
+const SubjectListPage = async ({
+  searchParams
+}: {
+  searchParams: { [key: string] : string | undefined }
+}) => {
+  const user = await requireUser();
+  const role = user.role;
+  const columns = getColumns(role);
+  const { page, ...queryParams } = await searchParams;
+  const p = page ? parseInt(page) : 1;
+
+  const query: Prisma.SubjectWhereInput = {};
+
+  if (queryParams) {
+    for (const [key, value] of Object.entries(queryParams)) {
+      if (value !== undefined) {
+        switch (key) {
+          case "search":
+            query.name = { contains: value, mode: "insensitive" };
+            break;
+          default:
+            break;
+        }
+      }
+    }
+  }
+
+  const [data, count] = await prisma.$transaction([
+    prisma.subject.findMany({
+      where: query,
+      include: {
+        teachers: true,
+      },
+      take: ITEM_PER_PAGE,
+      skip: ITEM_PER_PAGE * (p - 1)
+    }),
+    prisma.subject.count({ where: query }),
+  ]);
+  const renderRow = (item: SubjectList) => (
     <tr
       key={item.id}
       className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
     >
       <td className="flex items-center gap-4 p-4">{item.name}</td>
-      <td className="hidden md:table-cell">{item.teachers.join(",")}</td>
+      <td className="hidden md:table-cell">{item.teachers.map((teacher) => teacher.name).join(",")}</td>
       <td>
         <div className="flex items-center gap-2">
-          {role === "admin" && (
+          {role === "ADMIN" && (
             <>
               <FormModal table="subject" type="update" data={item} />
               <FormModal table="subject" type="delete" id={item.id} />
@@ -62,14 +98,14 @@ const SubjectListPage = () => {
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {role === "admin" && <FormModal table="teacher" type="create" />}
+            {role === "ADMIN" && <FormModal table="subject" type="create" />}
           </div>
         </div>
       </div>
       {/* LIST */}
-      <Table columns={columns} renderRow={renderRow} data={subjectsData} />
+      <Table columns={columns} renderRow={renderRow} data={data} />
       {/* PAGINATION */}
-      <Pagination />
+      <Pagination page={p} count={count}/>
     </div>
   );
 };

@@ -2,15 +2,15 @@ import FormModal from "@/components/FormModal";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
-import { parentsData, role } from "@/lib/data";
+import { requireUser } from "@/hooks/requireUser";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
-import { Parent, Prisma, Student } from "@prisma/client";
+import { Parent, Prisma, Student, UserRole } from "@prisma/client";
 import Image from "next/image";
 
 type ParentList = Parent & { students: Student[] };
 
-const columns = [
+const getColumns = (role: UserRole) => [
   {
     header: "Info",
     accessor: "info",
@@ -30,10 +30,10 @@ const columns = [
     accessor: "address",
     className: "hidden lg:table-cell",
   },
-  {
+  ...(role === "ADMIN" ? [{
     header: "Actions",
     accessor: "action",
-  },
+  }] : []),
 ];
 
 const ParentListPage = async ({
@@ -41,7 +41,9 @@ const ParentListPage = async ({
 }: {
   searchParams: { [key: string]: string | undefined };
 }) => {
-
+  const user = await requireUser();
+  const role = user.role;
+  const columns = getColumns(role);
   const { page, ...queryParams } = await searchParams;
   const p = page ? parseInt(page) : 1;
   
@@ -89,7 +91,7 @@ const ParentListPage = async ({
       <td className="hidden md:table-cell">{item.address}</td>
       <td>
         <div className="flex items-center gap-2">
-          {role === "admin" && (
+          {role === "ADMIN" && (
             <>
               <FormModal table="parent" type="update" data={item} />
               <FormModal table="parent" type="delete" id={item.id} />
@@ -114,8 +116,8 @@ const ParentListPage = async ({
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {role === "admin" && (
-              <FormModal table="teacher" type="create"/>
+            {role === "ADMIN" && (
+              <FormModal table="parent" type="create"/>
             )}
           </div>
         </div>

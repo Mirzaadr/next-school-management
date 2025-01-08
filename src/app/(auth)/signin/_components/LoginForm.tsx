@@ -38,7 +38,7 @@ const LoginForm = () => {
     <Card className="w-[400px] shadow-md">
       <CardHeader>
         <CardTitle>Login</CardTitle>
-        <CardDescription>Enter your credentials</CardDescription>
+        <CardDescription>Sign in to your account</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>

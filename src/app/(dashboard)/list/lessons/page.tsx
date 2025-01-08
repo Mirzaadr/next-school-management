@@ -2,17 +2,17 @@ import FormModal from "@/components/FormModal";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
-import { lessonsData, role } from "@/lib/data";
+import { requireUser } from "@/hooks/requireUser";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
-import { Lesson, Prisma, Subject, Class, Teacher } from "@prisma/client";
+import { Lesson, Prisma, Subject, Class, Teacher, UserRole } from "@prisma/client";
 import Image from "next/image";
 
 type LessonList = Lesson & { subject: Subject } & { class: Class } & {
   teacher: Teacher;
 };
 
-const columns = [
+const getColumns = (role: UserRole) => [
   {
     header: "Subject Name",
     accessor: "name",
@@ -26,10 +26,10 @@ const columns = [
     accessor: "teacher",
     className: "hidden md:table-cell",
   },
-  {
+  ...(role ==="ADMIN" ? [{
     header: "Actions",
     accessor: "action",
-  },
+  }] : []),
 ];
 
 const LessonListPage = async ({
@@ -37,7 +37,9 @@ const LessonListPage = async ({
 }: {
   searchParams: { [key: string]: string | undefined };
 }) => {
-
+  const user = await requireUser();
+  const role = user.role;
+  const columns = getColumns(role);
   const { page, ...queryParams } = await searchParams;
   const p = page ? parseInt(page) : 1;
   // URL PARAMS CONDITIONS
@@ -88,7 +90,7 @@ const LessonListPage = async ({
       <td className="hidden md:table-cell">{item.teacher.name}{" "}{item.teacher.surname}</td>
       <td>
         <div className="flex items-center gap-2">
-          {role === "admin" && (
+          {role === "ADMIN" && (
             <>
               <FormModal table="lesson" type="update" data={item} />
               <FormModal table="lesson" type="delete" id={item.id} />
@@ -113,7 +115,7 @@ const LessonListPage = async ({
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {role === "admin" && <FormModal table="lesson" type="create" />}
+            {role === "ADMIN" && <FormModal table="lesson" type="create" />}
           </div>
         </div>
       </div>
