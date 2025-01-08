@@ -35,8 +35,8 @@ export default function DashboardLayout({
           <div className="sticky">
             <Navbar />
           </div>
-          <div className="overflow-scroll">
-              {children}
+          <div className="overflow-scroll h-screen">
+            {children}
           </div>
         </div>
       </SessionProvider>
