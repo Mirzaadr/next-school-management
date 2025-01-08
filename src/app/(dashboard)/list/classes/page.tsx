@@ -2,15 +2,15 @@ import FormModal from "@/components/FormModal";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
-import { classesData, role } from "@/lib/data";
+import { requireUser } from "@/hooks/requireUser";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
-import { Class, Prisma, Teacher } from "@prisma/client";
+import { Class, Prisma, Teacher, UserRole } from "@prisma/client";
 import Image from "next/image";
 
 type ClassList = Class & { supervisor: Teacher };
 
-const columns = [
+const getColumns = (role: UserRole) => [
   {
     header: "Class Name",
     accessor: "name",
@@ -30,10 +30,10 @@ const columns = [
     accessor: "supervisor",
     className: "hidden md:table-cell",
   },
-  {
+  ...(role === "ADMIN" ? [{
     header: "Actions",
     accessor: "action",
-  },
+  }] : []),
 ];
 
 const ClassListPage = async ({
@@ -41,7 +41,9 @@ const ClassListPage = async ({
 }: {
   searchParams: { [key: string]: string | undefined };
 }) => {
-
+  const user = await requireUser();
+  const role = user.role;
+  const columns = getColumns(role);
   const { page, ...queryParams } = await searchParams;
   const p = page ? parseInt(page) : 1;
   // URL PARAMS CONDITIONS
@@ -63,6 +65,7 @@ const ClassListPage = async ({
       }
     }
   }
+
   const [data, count] = await prisma.$transaction([
     prisma.class.findMany({
       include: {
@@ -85,7 +88,7 @@ const ClassListPage = async ({
       <td className="hidden md:table-cell">{item.supervisor.name + " " + item.supervisor.surname}</td>
       <td>
         <div className="flex items-center gap-2">
-          {role === "admin" && (
+          {role === "ADMIN" && (
             <>
               <FormModal table="class" type="update" data={item} />
               <FormModal table="class" type="delete" id={item.id} />
@@ -110,7 +113,7 @@ const ClassListPage = async ({
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {role === "admin" && <FormModal table="class" type="create" />}
+            {role === "ADMIN" && <FormModal table="class" type="create" />}
           </div>
         </div>
       </div>

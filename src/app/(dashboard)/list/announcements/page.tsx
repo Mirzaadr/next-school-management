@@ -2,15 +2,15 @@ import FormModal from "@/components/FormModal";
 import Pagination from "@/components/Pagination";
 import Table from "@/components/Table";
 import TableSearch from "@/components/TableSearch";
-import { announcementsData, role } from "@/lib/data";
+import { requireUser } from "@/hooks/requireUser";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
-import { Prisma, Announcement, Class } from "@prisma/client";
+import { Prisma, Announcement, Class, UserRole } from "@prisma/client";
 import Image from "next/image";
 
 type AnnouncementList = Announcement & { class: Class };
 
-const columns = [
+const getColumns = (role: UserRole) => [
   {
     header: "Title",
     accessor: "title",
@@ -24,10 +24,10 @@ const columns = [
     accessor: "date",
     className: "hidden md:table-cell",
   },
-  {
+  ...(role === "ADMIN" ? [{
     header: "Actions",
     accessor: "action",
-  },
+  }] : []),
 ];
 
 const AnnouncementListPage = async ({
@@ -36,7 +36,10 @@ const AnnouncementListPage = async ({
   searchParams: { [key: string]: string | undefined };
 }) => {
   const { page, ...queryParams } = await  searchParams;
+  const user = await requireUser();
+  const role = user.role;
   const p = page ? parseInt(page) : 1;
+  const columns = getColumns(role);
   // URL PARAMS CONDITIONS
   const query: Prisma.AnnouncementWhereInput = {}
   
@@ -75,7 +78,7 @@ const AnnouncementListPage = async ({
       <td className="hidden md:table-cell">{new Intl.DateTimeFormat("en-US").format(item.date)}</td>
       <td>
         <div className="flex items-center gap-2">
-          {role === "admin" && (
+          {role === "ADMIN" && (
             <>
               <FormModal table="announcement" type="update" data={item} />
               <FormModal table="announcement" type="delete" id={item.id} />
@@ -102,7 +105,7 @@ const AnnouncementListPage = async ({
             <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {role === "admin" && (
+            {role === "ADMIN" && (
               <FormModal table="announcement" type="create" />
             )}
           </div>

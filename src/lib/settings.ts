@@ -3,7 +3,7 @@
  * of the table.
  * @type {number}
  */
-export const ITEM_PER_PAGE = 5
+export const ITEM_PER_PAGE = 10
 
 /**
  * An array of routes that are accessible to the public
@@ -55,17 +55,18 @@ export const routeAccessMap: RouteAccessMap = {
   "/student{/*path}": ["student"],
   "/teacher{/*path}": ["teacher"],
   "/parent{/*path}": ["parent"],
-  "/list/teachers": ["admin", "teacher"],
-  "/list/students": ["admin", "teacher"],
-  "/list/parents": ["admin", "teacher"],
-  "/list/subjects": ["admin"],
-  "/list/classes": ["admin", "teacher"],
-  "/list/exams": ["admin", "teacher", "student", "parent"],
-  "/list/assignments": ["admin", "teacher", "student", "parent"],
-  "/list/results": ["admin", "teacher", "student", "parent"],
-  "/list/attendance": ["admin", "teacher", "student", "parent"],
-  "/list/events": ["admin", "teacher", "student", "parent"],
-  "/list/announcements": ["admin", "teacher", "student", "parent"],
+  "/list/teachers{/*path}": ["admin", "teacher"],
+  "/list/students{/*path}": ["admin", "teacher"],
+  "/list/parents{/*path}": ["admin", "teacher"],
+  "/list/subjects{/*path}": ["admin"],
+  "/list/classes{/*path}": ["admin", "teacher"],
+  "/list/lessons{/*path}": ["admin", "teacher", "parent", "student"],
+  "/list/exams{/*path}": ["admin", "teacher", "student", "parent"],
+  "/list/assignments{/*path}": ["admin", "teacher", "student", "parent"],
+  "/list/results{/*path}": ["admin", "teacher", "student", "parent"],
+  "/list/attendance{/*path}": ["admin", "teacher", "student", "parent"],
+  "/list/events{/*path}": ["admin", "teacher", "student", "parent"],
+  "/list/announcements{/*path}": ["admin", "teacher", "student", "parent"],
   "/profile": ["admin", "teacher", "student", "parent"],
   "/settings": ["admin", "teacher", "student", "parent"],
 };
