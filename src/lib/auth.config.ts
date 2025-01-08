@@ -43,6 +43,10 @@ export default {
         session.user.role = token.role;
       }
 
+      if (token.profileId && session.user) {
+        session.user.profileId = token.profileId;
+      }
+
       if (token.user) {
         session.user.name = token.name;
         session.user.email = token.email || session.user.email;
