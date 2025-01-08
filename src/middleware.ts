@@ -21,47 +21,27 @@ export default auth((req) => {
   if (isApiAuthRoute) {
     return;
   }
-
-  if (isLoggedIn) {
-    if (isAuthRoute) {
+  
+  if(isAuthRoute) {
+    if (isLoggedIn) {
       return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl.origin))
     }
-
-    if (!isPublicRoute) {
-      const role = req.auth?.user.role.toLowerCase();
-      const isAllowed = matchers.reduce((acc, {matcher, allowedRoles}) => {
-        if (acc) return acc;
-        return matcher(req) && allowedRoles.includes(role!);
-      }, false);
-    
-      if (!isAllowed) {
-        return Response.redirect(new URL(`/${role}`, nextUrl));
-      }
-    }
-
     return;
   }
   
-  // if(isAuthRoute) {
-  //   if (isLoggedIn) {
-  //     return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl.origin))
-  //   }
-  //   return;
-  // }
-  
-  // if (isLoggedIn && !isPublicRoute) {
-  //   const role = req.auth?.user.role.toLowerCase();
-  //   const isAllowed = matchers.reduce((acc, {matcher, allowedRoles}) => {
-  //     if (acc) return acc;
-  //     return matcher(req) && allowedRoles.includes(role!);
-  //   }, false);
+  if (isLoggedIn && !isPublicRoute) {
+    const role = req.auth?.user.role.toLowerCase();
+    const isAllowed = matchers.reduce((acc, {matcher, allowedRoles}) => {
+      if (acc) return acc;
+      return matcher(req) && allowedRoles.includes(role!);
+    }, false);
 
-  //   // console.log(`${nextUrl.pathname} : ${isAllowed ? "Allowed" : "Not Allowed"}`)
+    // console.log(`${nextUrl.pathname} : ${isAllowed ? "Allowed" : "Not Allowed"}`)
 
-  //   if (!isAllowed) {
-  //     return Response.redirect(new URL(`/${role}`, nextUrl));
-  //   }
-  // }
+    if (!isAllowed) {
+      return Response.redirect(new URL(`/${role}`, nextUrl));
+    }
+  }
   
   if (!isLoggedIn && !isPublicRoute) {
     let callbackUrl = nextUrl.pathname;
