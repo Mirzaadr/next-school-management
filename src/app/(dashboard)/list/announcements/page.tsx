@@ -66,12 +66,12 @@ const AnnouncementListPage = async ({
     "PARENT": { students: { some: { parentId: user.profileId } } },
   }
 
-  query.OR = [
+  query.OR = role !== "ADMIN" ? [
     { classId: null },
     {
       class: roleConditions[role as keyof typeof roleConditions] || {}
     }
-  ];
+  ] : undefined;
 
   const [data, count] = await prisma.$transaction([
     prisma.announcement.findMany({
