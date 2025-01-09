@@ -14,7 +14,7 @@ const ParentPage = async () => {
   return (
     <div className="p-4 flex gap-4 flex-col xl:flex-row flex-1 h-full">
       {/* LEFT */}
-      <div>
+      <>
         {students.map((student) => (
           <div className="w-full xl:w-2/3" key={student.id}>
             <BigCalendarContainer
@@ -24,7 +24,7 @@ const ParentPage = async () => {
             />
           </div>
         ))}
-      </div>
+      </>
       {/* RIGHT */}
       <div className="w-full xl:w-1/3 flex flex-col gap-8">
         <Announcements />
