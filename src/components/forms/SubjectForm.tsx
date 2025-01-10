@@ -35,7 +35,6 @@ const SubjectForm = ({
   } = useForm<SubjectSchema>({
     resolver: zodResolver(subjectSchema),
   });
-  console.log(data)
   
   const [state, formAction] = useActionState(
     actionsMap[type],
@@ -77,7 +76,7 @@ const SubjectForm = ({
         {data && <input hidden defaultValue={data?.id} {...register("id")} type="text | number"/>}
 
         <div className="flex flex-col gap-2 w-full md:w-1/4">
-          <label className="text-xs text-gray-500">Sex</label>
+          <label className="text-xs text-gray-500">Teachers</label>
           <select
             multiple
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
