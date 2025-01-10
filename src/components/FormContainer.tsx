@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import FormModal from "./FormModal";
+import { Teacher } from "@prisma/client";
 
 export interface IFormProps {
   table:
@@ -35,6 +36,10 @@ const FormContainer = async ({
           select: { id: true, name: true, surname: true, }
         });
         relatedData = { teachers: subjectTeachers };
+        if (data && data.teachers ) {
+          const teachersSelected = data.teachers.map((teacher: Teacher) => teacher.id)
+          data.teachers = teachersSelected;
+        }
         break;
       case "class":
         const classGrades = await prisma.grade.findMany({

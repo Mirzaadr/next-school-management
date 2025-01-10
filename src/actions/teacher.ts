@@ -2,35 +2,11 @@
 
 import { TeacherSchema } from "@/lib/formValidationSchemas";
 import prisma from "@/lib/prisma";
-import bcrypt from "bcryptjs";
+import { registerUser } from "@/actions/login";
 
 type CurrentState = {
   success: boolean;
   error: boolean;
-}
-
-const registerUser = async (data: {
-  username: string;
-  password: string;
-  name: string;
-  email?: string;
-}) => {
-  try {
-    // TODO: check unique username or email 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-    const user = await prisma.user.create({
-      data: {
-        username: data.username,
-        name: data.name || null,
-        password: hashedPassword,
-        email: data.email || "",
-        role: "TEACHER",
-      }
-    });
-    return user;
-  } catch (error) {
-    console.error(JSON.stringify(error));
-  }
 }
 
 export const createTeacher = async (currentState:CurrentState, data:TeacherSchema) => {
@@ -40,6 +16,7 @@ export const createTeacher = async (currentState:CurrentState, data:TeacherSchem
       password: data.password,
       name: data.name + " " + data.surname,
       email: data.email,
+      role: "TEACHER",
     });
 
     if (!user) {
@@ -104,7 +81,7 @@ export const deleteTeacher = async (currentState:CurrentState, data:FormData) =>
     // revalidatePath("/list/teachers");
     return { success: true, error: false };
   } catch (error) {
-    console.error(error)
+    console.error(JSON.stringify(error))
     return { success: false, error: true };
   }  
 }
