@@ -22,7 +22,7 @@ interface IClassForm {
 const actionsMap = {
   create: createClass,
   update: updateClass,
-} 
+};
 
 const ClassForm = ({
   type, data, setOpen, relatedData,
@@ -35,7 +35,6 @@ const ClassForm = ({
   } = useForm<ClassSchema>({
     resolver: zodResolver(classSchema),
   });
-  console.log(data)
   
   const [state, formAction] = useActionState(
     actionsMap[type],

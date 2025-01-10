@@ -8,11 +8,12 @@ import { toast } from "sonner";
 import { IFormProps } from "./FormContainer";
 import { deleteSubject } from "@/actions/subject";
 import { deleteClass } from "@/actions/class";
+import { deleteTeacher } from "@/actions/teacher";
 
 const deleteActionMap = {
   subject: deleteSubject,
   class: deleteClass,
-  teacher: deleteSubject,
+  teacher: deleteTeacher,
   student: deleteSubject,
   exam: deleteSubject,
 // TODO: OTHER DELETE ACTIONS
@@ -50,8 +51,8 @@ const forms: {
     relatedData?: any,
   ) => ReactElement;
 } = {
-  teacher: (setOpen, type, data) => (
-    <TeacherForm type={type} data={data} setOpen={setOpen} />
+  teacher: (setOpen, type, data, relatedData) => (
+    <TeacherForm type={type} data={data} setOpen={setOpen} relatedData={relatedData}/>
   ),
   student: (setOpen, type, data) => (
     <StudentForm type={type} data={data} setOpen={setOpen} />
